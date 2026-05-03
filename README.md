@@ -17,7 +17,7 @@ Portfolio full-stack construit en 4 étapes avec React, Node.js, Socket.IO, WebR
 ```
 portfolio-projet/
 ├── client/       # React + Vite + Tailwind
-├── server/       # Express + Socket.IO
+├── server/       # Express + Socket.IO + SQLite
 ├── docker-compose.yml
 └── .env.example
 ```
@@ -50,12 +50,11 @@ Copier `.env.example` et créer un `.env` à la racine :
 cp .env.example .env
 ```
 
-Créer aussi `client/.env` pour EmailJS :
+Créer aussi `client/.env` :
 
 ```
-VITE_EMAILJS_SERVICE_ID=your_service_id
-VITE_EMAILJS_TEMPLATE_ID=your_template_id
-VITE_EMAILJS_PUBLIC_KEY=your_public_key
+VITE_API_URL=http://localhost:3001
+VITE_SERVER_URL=http://localhost:3001
 ```
 
 ### Docker
@@ -70,15 +69,15 @@ Le portfolio sera accessible sur `http://localhost`.
 
 | Étape | Description | Status |
 |-------|-------------|--------|
-| 1 | Portfolio React + Tailwind + Déploiement Vercel | ✅ En cours |
-| 2 | Chat temps réel avec Socket.IO | ⬜ À faire |
-| 3 | API REST + JWT + Swagger | ⬜ À faire |
-| 4 | Vidéo WebRTC | ⬜ À faire |
+| 1 | Portfolio React + Tailwind + Déploiement Vercel | ✅ Complété |
+| 2 | Chat temps réel avec Socket.IO | ✅ Complété |
+| 3 | API REST + JWT + Swagger | ✅ Complété |
+| 4 | Vidéo WebRTC | ✅ Complété |
 
 ## Déploiement
 
 | Service | URL |
 |---------|-----|
-| Frontend (Vercel) | _à compléter_ |
-| Backend (Render) | _à compléter_ |
-| API Docs (Swagger) | _à compléter_ |
+| Frontend (Vercel) | https://portfolio-projet-zeta.vercel.app |
+| Backend (Render) | https://portfolio-api-dleh.onrender.com |
+| API Docs (Swagger) | https://portfolio-api-dleh.onrender.com/api/docs |
