@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import ChatBox from './components/ChatBox'
 import Home from './pages/Home'
 import NotFound from './pages/NotFound'
 
@@ -13,6 +14,7 @@ export default function App() {
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />
+      <ChatBox />
     </BrowserRouter>
   )
 }
