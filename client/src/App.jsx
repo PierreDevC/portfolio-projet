@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ChatBox from './components/ChatBox'
+import VideoChat from './components/VideoChat'
 import Home from './pages/Home'
 import NotFound from './pages/NotFound'
 import Admin from './pages/Admin'
@@ -17,6 +18,7 @@ export default function App() {
       </Routes>
       <Footer />
       <ChatBox />
+      <VideoChat />
     </BrowserRouter>
   )
 }

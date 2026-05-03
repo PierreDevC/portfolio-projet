@@ -11,7 +11,10 @@ export function useApi(endpoint) {
   useEffect(() => {
     API.get(endpoint)
       .then(r => setData(r.data))
-      .catch(e => setError(e.message))
+      .catch(e => {
+        console.error(`[useApi] GET ${endpoint} failed:`, e.message)
+        setError(e.message)
+      })
       .finally(() => setLoading(false))
   }, [endpoint])
 

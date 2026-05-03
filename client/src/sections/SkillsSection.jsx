@@ -5,11 +5,11 @@ import { useApi } from '../hooks/useApi'
 
 export default function SkillsSection() {
   const ref = useRef(null)
-  const inView = useInView(ref, { once: true, margin: '-100px' })
+  const inView = useInView(ref, { once: true, margin: '-200px' })
   const { data: skills, loading } = useApi('/api/skills')
 
   return (
-    <section id="skills" className="py-24 bg-gray-50 dark:bg-gray-950">
+    <section id="skills" ref={ref} className="py-24 bg-gray-50 dark:bg-gray-950">
       <div className="max-w-6xl mx-auto px-6">
         <p className="text-sm font-semibold text-violet-600 dark:text-violet-400 uppercase tracking-widest mb-3">Compétences</p>
         <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-12">Mon stack technique</h2>
@@ -18,7 +18,7 @@ export default function SkillsSection() {
             <div className="w-8 h-8 border-4 border-violet-600 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
-          <div ref={ref} className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-8">
             {Object.entries(skills || {}).map(([category, items]) => (
               <div key={category} className="bg-white dark:bg-gray-900 rounded-xl p-6 border border-gray-200 dark:border-gray-800">
                 <h3 className="font-semibold mb-6 uppercase text-xs tracking-widest text-violet-600 dark:text-violet-400">{category}</h3>

@@ -5,3 +5,6 @@ dist/
 CLAUDE.md
 Portfolio_Projet_Final.pdf
 .claude/
+portfolio.db
+portfolio.db-shm
+portfolio.db-wal
