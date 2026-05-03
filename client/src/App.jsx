@@ -4,6 +4,7 @@ import Footer from './components/Footer'
 import ChatBox from './components/ChatBox'
 import Home from './pages/Home'
 import NotFound from './pages/NotFound'
+import Admin from './pages/Admin'
 
 export default function App() {
   return (
@@ -11,6 +12,7 @@ export default function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/admin" element={<Admin />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />
