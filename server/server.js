@@ -8,8 +8,14 @@ import { autoSeed } from './seed/seed.js'
 await autoSeed()
 
 const httpServer = createServer(app)
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  'http://localhost:5173',
+  'http://localhost',
+].filter(Boolean)
+
 const io = new Server(httpServer, {
-  cors: { origin: process.env.CLIENT_URL || 'http://localhost:5173' }
+  cors: { origin: allowedOrigins }
 })
 
 //

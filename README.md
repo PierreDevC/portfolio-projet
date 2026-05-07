@@ -1,78 +1,67 @@
-# Portfolio Professionnel & Communication Temps Réel
+# Portfolio Professionnel - Pierre C.
 
-Projet final du cours 420-TT4-AS — Collège LaSalle.  
-Portfolio full-stack construit en 4 étapes avec React, Node.js, Socket.IO, WebRTC et Docker.
+Projet final du cours Tendance Technologiques
+Portfolio full-stack construit en 4 étapes progressives avec React, Node.js, Socket.IO, WebRTC et Docker.
+
+🔗 **Live** → [portfolio-projet-zeta.vercel.app](https://portfolio-projet-zeta.vercel.app)
+
+---
 
 ## Stack
 
 | Couche | Technologies |
 |--------|-------------|
-| Frontend | React 19, Vite, Tailwind CSS, React Router v6, Framer Motion |
-| Backend | Node.js 20, Express 5, Socket.IO |
-| Temps réel (vidéo) | WebRTC (étape 4) |
-| Conteneurisation | Docker, Docker Compose |
+| Frontend | React 19, Vite, Tailwind CSS, Framer Motion |
+| Backend | Node.js 20, Express 5, SQLite (better-sqlite3) |
+| Temps réel | Socket.IO (chat + signalisation WebRTC) |
+| Vidéo P2P | WebRTC natif (RTCPeerConnection + STUN Google) |
+| Auth | JWT + bcrypt |
+| Docs API | Swagger UI `/api/docs` |
+| Conteneurisation | Docker + Docker Compose |
+| Déploiement | Vercel (frontend) + Render (backend) |
 
-## Structure
-
-```
-portfolio-projet/
-├── client/       # React + Vite + Tailwind
-├── server/       # Express + Socket.IO + SQLite
-├── docker-compose.yml
-└── .env.example
-```
-
-## Installation
-
-### Prérequis
-- Node.js 20+
-- Docker + Docker Compose
-
-### Développement local
-
-```bash
-# Client (http://localhost:5173)
-cd client
-npm install
-npm run dev
-
-# Serveur (http://localhost:3001)
-cd server
-npm install
-npm run dev
-```
-
-### Variables d'environnement
-
-Copier `.env.example` et créer un `.env` à la racine :
-
-```bash
-cp .env.example .env
-```
-
-Créer aussi `client/.env` :
-
-```
-VITE_API_URL=http://localhost:3001
-VITE_SERVER_URL=http://localhost:3001
-```
-
-### Docker
-
-```bash
-docker-compose up --build
-```
-
-Le portfolio sera accessible sur `http://localhost`.
+---
 
 ## Étapes du projet
 
 | Étape | Description | Status |
 |-------|-------------|--------|
-| 1 | Portfolio React + Tailwind + Déploiement Vercel | ✅ Complété |
-| 2 | Chat temps réel avec Socket.IO | ✅ Complété |
-| 3 | API REST + JWT + Swagger | ✅ Complété |
-| 4 | Vidéo WebRTC | ✅ Complété |
+| 1 | Portfolio React + Tailwind + animations Framer Motion | ✅ |
+| 2 | Chat temps réel avec Socket.IO | ✅ |
+| 3 | API REST + JWT + CRUD + Swagger | ✅ |
+| 4 | Vidéo/audio WebRTC pair-à-pair | ✅ |
+
+---
+
+## Lancer en local (Docker)
+
+```bash
+git clone https://github.com/PierreDevC/portfolio-projet.git
+cd portfolio-projet
+docker-compose up --build
+```
+
+Ouvre `http://localhost` dans ton navigateur.
+
+---
+
+## Lancer en développement
+
+```bash
+# Serveur (http://localhost:3001)
+cd server && npm install && npm run dev
+
+# Client (http://localhost:5173)
+cd client && npm install && npm run dev
+```
+
+Variables d'environnement requises dans `server/.env` :
+```
+JWT_SECRET=...
+CLIENT_URL=http://localhost:5173
+```
+
+---
 
 ## Déploiement
 

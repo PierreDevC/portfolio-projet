@@ -1,4 +1,5 @@
 import { FiGithub, FiLinkedin, FiMail } from 'react-icons/fi'
+import { Link } from 'react-router-dom'
 
 export default function Footer() {
   return (
@@ -20,6 +21,10 @@ export default function Footer() {
             className="text-gray-500 hover:text-violet-600 dark:hover:text-violet-400 transition-colors">
             <FiMail size={20} />
           </a>
+          <Link to="/admin"
+            className="text-xs text-gray-300 dark:text-gray-700 hover:text-gray-500 dark:hover:text-gray-500 transition-colors">
+            admin
+          </Link>
         </div>
       </div>
     </footer>

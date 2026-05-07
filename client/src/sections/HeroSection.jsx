@@ -29,7 +29,7 @@ export default function HeroSection() {
               className="px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-medium transition-colors">
               Me contacter
             </a>
-            <a href="/cv.pdf" download
+            <a href="/Pierre_CV.pdf" target="_blank" rel="noreferrer"
               className="flex items-center gap-2 px-6 py-3 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-violet-500 dark:hover:border-violet-500 rounded-lg font-medium transition-colors">
               <FiDownload size={16} /> Télécharger CV
             </a>

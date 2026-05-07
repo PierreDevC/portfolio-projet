@@ -1,6 +1,10 @@
 services:
   client:
-    build: ./client
+    build:
+      context: ./client
+      args:
+        - VITE_API_URL=http://localhost:3001
+        - VITE_SERVER_URL=http://localhost:3001
     ports:
       - "80:80"
     depends_on:
@@ -12,5 +16,5 @@ services:
       - "3001:3001"
     environment:
       - PORT=3001
-      - JWT_SECRET=${JWT_SECRET}
-      - CLIENT_URL=${CLIENT_URL}
+      - JWT_SECRET=${JWT_SECRET:-local_docker_secret}
+      - CLIENT_URL=http://localhost

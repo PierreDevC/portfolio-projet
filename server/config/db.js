@@ -51,4 +51,9 @@ db.exec(`
   );
 `)
 
+// Idempotent column migrations (safe to run on existing DBs)
+try { db.exec('ALTER TABLE messages ADD COLUMN read INTEGER DEFAULT 0') } catch {}
+try { db.exec('ALTER TABLE messages ADD COLUMN archived INTEGER DEFAULT 0') } catch {}
+try { db.exec('ALTER TABLE messages ADD COLUMN reply TEXT') } catch {}
+
 export default db
