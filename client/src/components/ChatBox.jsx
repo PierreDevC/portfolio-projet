@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FiMessageCircle, FiX, FiUsers } from 'react-icons/fi'
 import { useChat } from '../hooks/useChat'
+import { useAuth } from '../hooks/useAuth'
 import ChatMessage from './ChatMessage'
 import ChatInput from './ChatInput'
 
@@ -11,6 +12,14 @@ export default function ChatBox() {
   const [unread, setUnread] = useState(0)
   const messagesEndRef = useRef(null)
   const { username, joined, messages, typingUsers, usersCount, join, sendMessage, sendTyping } = useChat()
+  const { isAdmin } = useAuth()
+
+  // Auto-join as Admin when logged in as admin
+  useEffect(() => {
+    if (isAdmin && !joined) {
+      join('Admin')
+    }
+  }, [isAdmin, joined, join])
 
   // Auto-scroll to latest message
   useEffect(() => {
