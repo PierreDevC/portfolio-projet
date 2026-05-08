@@ -15,33 +15,37 @@ export default function Admin() {
   const { token, isAdmin, login, logout } = useAuth()
   const navigate = useNavigate()
   const socket   = useSocket()
+
+  // état de connexion
   const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
   const [error, setError]       = useState('')
 
-  // Tab
+  // onglet actif (projets, messages ou chat)
   const [activeTab, setActiveTab] = useState('projects')
 
-  // Projects state
+  // gestion des projets et formulaire d'édition
   const [projects, setProjects] = useState([])
   const [form, setForm]         = useState(EMPTY)
   const [editing, setEditing]   = useState(null)
 
-  // Contact messages state
+  // messages de contact: filtrage, réponses et archivage
   const [messages, setMessages]     = useState([])
   const [msgFilter, setMsgFilter]   = useState('all')
   const [replyingTo, setReplyingTo] = useState(null)
   const [replyText, setReplyText]   = useState('')
 
-  // Chat state
+  // chat en direct: messages, recherche, état de connexion
   const [allMessages, setAllMessages] = useState([])
   const [chatInput, setChatInput]     = useState('')
   const [chatSearch, setChatSearch]   = useState('')
   const [chatJoined, setChatJoined]   = useState(false)
   const chatBottomRef = useRef(null)
 
+  // en-tête d'autorisation pour les appels API
   const headers = { Authorization: `Bearer ${token}` }
 
+  // charge les projets et messages au chargement initial
   useEffect(() => {
     if (isAdmin) {
       fetchProjects()
@@ -49,45 +53,51 @@ export default function Admin() {
     }
   }, [isAdmin])
 
-  // Load chat history + subscribe to real-time when Chat tab is active
+  // au changement d'onglet vers Chat: charger l'historique et s'abonner aux nouveaux messages
   useEffect(() => {
     if (activeTab !== 'chat' || !socket || !isAdmin) return
 
+    // récupère tous les logs du chat et les inverse (plus récents en bas)
     API.get('/api/chat/logs', { headers })
       .then(({ data }) => setAllMessages([...data].reverse()))
 
+    // rejoint le chat en tant qu'Admin si pas encore fait
     if (!chatJoined) {
       socket.emit('user:join', 'Admin')
       setChatJoined(true)
     }
 
+    // écoute les nouveaux messages et les ajoute à la liste
     const handler = (msg) => setAllMessages(prev => [...prev, msg])
     socket.on('message:receive', handler)
     return () => socket.off('message:receive', handler)
   }, [activeTab, socket, isAdmin])
 
-  // Auto-scroll on new chat messages
+  // scroll automatique vers le bas quand de nouveaux messages arrivent
   useEffect(() => {
     chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [allMessages])
 
-  // ── Helpers ───────────────────────────────────────────────
+  // fonctions utilitaires pour le formatage et les couleurs
   const formatDate = (iso) => new Date(iso).toLocaleDateString('fr-CA', {
     day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
   })
   const formatTime = (iso) => new Date(iso).toLocaleTimeString('fr-CA', {
     hour: '2-digit', minute: '2-digit'
   })
+  // première lettre du nom en majuscule pour l'avatar
   const getInitial   = (name) => name?.charAt(0).toUpperCase() || '?'
+  // palette de couleurs pour les avatars, basée sur le premier caractère du nom
   const avatarColors = ['bg-violet-500', 'bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-pink-500', 'bg-teal-500']
   const getColor     = (name) => avatarColors[(name?.charCodeAt(0) || 0) % avatarColors.length]
 
-  // ── Projects ──────────────────────────────────────────────
+  // récupère tous les projets depuis l'API
   const fetchProjects = async () => {
     const { data } = await API.get('/api/projects')
     setProjects(data)
   }
 
+  // tentative de connexion avec email/mot de passe
   const handleLogin = async (e) => {
     e.preventDefault()
     try {
@@ -98,8 +108,10 @@ export default function Admin() {
     }
   }
 
+  // ajoute ou met à jour un projet (submit du formulaire)
   const handleSubmit = async (e) => {
     e.preventDefault()
+    // divise les tags par virgule et nettoie les espaces inutiles
     const payload = { ...form, tags: form.tags.split(',').map(t => t.trim()).filter(Boolean) }
     if (editing) {
       await API.put(`/api/projects/${editing}`, payload, { headers })
@@ -111,39 +123,45 @@ export default function Admin() {
     fetchProjects()
   }
 
+  // supprime un projet après confirmation
   const handleDeleteProject = async (id) => {
     if (!confirm('Supprimer ce projet ?')) return
     await API.delete(`/api/projects/${id}`, { headers })
     fetchProjects()
   }
 
+  // prépare le formulaire pour éditer un projet existant
   const startEdit = (p) => {
     setEditing(p.id)
     setForm({ ...p, tags: p.tags.join(', ') })
   }
 
-  // ── Contact messages ──────────────────────────────────────
+  // récupère tous les messages de contact
   const fetchMessages = async () => {
     const { data } = await API.get('/api/contact/messages', { headers })
     setMessages(data)
   }
 
+  // bascule le statut lu/non lu d'un message
   const toggleRead = async (msg) => {
     await API.patch(`/api/contact/messages/${msg.id}/read`, { read: !msg.read }, { headers })
     setMessages(prev => prev.map(m => m.id === msg.id ? { ...m, read: msg.read ? 0 : 1 } : m))
   }
 
+  // bascule l'archivage d'un message
   const toggleArchive = async (msg) => {
     await API.patch(`/api/contact/messages/${msg.id}/archive`, { archived: !msg.archived }, { headers })
     setMessages(prev => prev.map(m => m.id === msg.id ? { ...m, archived: msg.archived ? 0 : 1 } : m))
   }
 
+  // supprime définitivement un message après confirmation
   const handleDeleteMessage = async (id) => {
     if (!confirm('Supprimer ce message ?')) return
     await API.delete(`/api/contact/messages/${id}`, { headers })
     setMessages(prev => prev.filter(m => m.id !== id))
   }
 
+  // enregistre la réponse de l'admin sur un message
   const handleReply = async (id) => {
     if (!replyText.trim()) return
     await API.patch(`/api/contact/messages/${id}/reply`, { reply: replyText }, { headers })
@@ -152,21 +170,24 @@ export default function Admin() {
     setReplyText('')
   }
 
+  // ouvre le formulaire de réponse pour un message
   const openReply = (msg) => {
     setReplyingTo(msg.id)
     setReplyText(msg.reply || '')
   }
 
+  // applique le filtre sélectionné aux messages
   const filteredMessages = messages.filter(m => {
     if (msgFilter === 'unread')   return !m.archived && !m.read
     if (msgFilter === 'archived') return m.archived
     return !m.archived
   })
 
+  // compte des messages non lus et archivés
   const unreadCount   = messages.filter(m => !m.archived && !m.read).length
   const archivedCount = messages.filter(m => m.archived).length
 
-  // ── Chat ──────────────────────────────────────────────────
+  // envoie un message dans le chat en tant qu'Admin
   const sendChatMessage = (e) => {
     e?.preventDefault()
     if (!chatInput.trim() || !socket) return
@@ -174,27 +195,30 @@ export default function Admin() {
     setChatInput('')
   }
 
+  // supprime un message du chat après confirmation
   const handleDeleteChatMsg = async (msg) => {
     if (!confirm('Supprimer ce message ?')) return
-    // Only DB-backed messages have a numeric id from autoincrement
-    // Real-time messages that haven't been saved yet won't be in DB but timestamp id matches
+    // essaie de supprimer de la DB, ignore l'erreur si le message n'y existe pas encore
     await API.delete(`/api/chat/logs/${msg.id}`, { headers }).catch(() => {})
     setAllMessages(prev => prev.filter(m => m.id !== msg.id))
   }
 
+  // vide tout l'historique du chat après confirmation
   const handleClearChat = async () => {
     if (!confirm('Vider tous les messages du chat ? Cette action est irréversible.')) return
     await API.delete('/api/chat/logs', { headers })
     setAllMessages([])
   }
 
+  // filtre les messages par nom d'utilisateur si une recherche est active
   const filteredChat = chatSearch.trim()
     ? allMessages.filter(m => m.username?.toLowerCase().includes(chatSearch.toLowerCase()))
     : allMessages
 
+  // compte des utilisateurs uniques dans le chat
   const uniqueChatUsers = new Set(allMessages.map(m => m.username)).size
 
-  // ── Login screen ──────────────────────────────────────────
+  // affiche l'écran de connexion si pas encore authentifié
   if (!isAdmin) {
     return (
       <main className="min-h-screen bg-gray-950 flex items-center justify-center">
@@ -217,7 +241,7 @@ export default function Admin() {
     <main className="min-h-screen bg-gray-950 text-white p-8">
       <div className="max-w-4xl mx-auto">
 
-        {/* Header */}
+        {/* en-tête avec bouton de déconnexion */}
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-bold">Panneau Admin</h1>
           <button onClick={() => { logout(); navigate('/') }} className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors">
@@ -225,7 +249,7 @@ export default function Admin() {
           </button>
         </div>
 
-        {/* Tab switcher */}
+        {/* sélecteur d'onglet (Projets, Messages, Chat) */}
         <div className="flex gap-2 mb-8 border-b border-gray-800">
           <button onClick={() => setActiveTab('projects')}
             className={`px-4 py-2 text-sm font-medium rounded-t transition-colors ${
@@ -257,9 +281,10 @@ export default function Admin() {
           </button>
         </div>
 
-        {/* ── PROJECTS TAB ────────────────────────────────── */}
+        {/* onglet projets: formulaire + liste */}
         {activeTab === 'projects' && (
           <>
+            {/* formulaire d'ajout/édition de projet */}
             <form onSubmit={handleSubmit} className="bg-gray-900 rounded-xl p-6 mb-8 flex flex-col gap-3">
               <h2 className="font-semibold text-violet-400">{editing ? 'Modifier le projet' : 'Ajouter un projet'}</h2>
               {['title', 'description', 'tags', 'github', 'live', 'image'].map(field => (
@@ -281,6 +306,7 @@ export default function Admin() {
               </div>
             </form>
 
+            {/* liste des projets avec actions d'édition/suppression */}
             <div className="flex flex-col gap-3">
               {projects.map(p => (
                 <div key={p.id} className="bg-gray-900 rounded-xl p-4 flex items-center justify-between gap-4">
@@ -298,15 +324,17 @@ export default function Admin() {
           </>
         )}
 
-        {/* ── MESSAGES TAB ────────────────────────────────── */}
+        {/* onglet messages de contact: filtrage + liste complète */}
         {activeTab === 'messages' && (
           <>
+            {/* stats (total, non lus, archivés) */}
             <div className="flex gap-6 text-sm text-gray-400 mb-4">
               <span><span className="text-white font-medium">{messages.filter(m => !m.archived).length}</span> total</span>
               <span><span className="text-violet-400 font-medium">{unreadCount}</span> non lus</span>
               <span><span className="text-gray-500 font-medium">{archivedCount}</span> archivés</span>
             </div>
 
+            {/* boutons de filtrage */}
             <div className="flex gap-2 mb-6">
               {[{ key: 'all', label: 'Tous' }, { key: 'unread', label: 'Non lus' }, { key: 'archived', label: 'Archivés' }].map(f => (
                 <button key={f.key} onClick={() => setMsgFilter(f.key)}
@@ -318,6 +346,7 @@ export default function Admin() {
               ))}
             </div>
 
+            {/* affichage des messages avec actions de gestion */}
             {filteredMessages.length === 0 ? (
               <div className="text-center py-16 text-gray-600">
                 <FiInbox size={32} className="mx-auto mb-3" />
@@ -327,6 +356,7 @@ export default function Admin() {
               <div className="flex flex-col gap-4">
                 {filteredMessages.map(msg => (
                   <div key={msg.id} className={`bg-gray-900 rounded-xl p-5 flex flex-col gap-3 border-l-4 ${msg.read ? 'border-gray-800' : 'border-violet-500'}`}>
+                    {/* en-tête du message: avatar, nom, statut lu, date */}
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3">
                         <div className={`w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 ${getColor(msg.name)}`}>
@@ -343,8 +373,10 @@ export default function Admin() {
                       <p className="text-xs text-gray-500 shrink-0">{formatDate(msg.created_at)}</p>
                     </div>
 
+                    {/* contenu du message */}
                     <p className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">{msg.message}</p>
 
+                    {/* affiche la réponse admin si elle existe */}
                     {msg.reply && (
                       <div className="bg-gray-800 rounded-lg px-4 py-3 border-l-2 border-violet-600">
                         <p className="text-xs text-violet-400 font-medium mb-1">Réponse admin</p>
@@ -352,6 +384,7 @@ export default function Admin() {
                       </div>
                     )}
 
+                    {/* formulaire de réponse (s'affiche si on clique sur Répondre) */}
                     {replyingTo === msg.id && (
                       <div className="flex flex-col gap-2">
                         <textarea value={replyText} onChange={e => setReplyText(e.target.value)}
@@ -370,6 +403,7 @@ export default function Admin() {
                       </div>
                     )}
 
+                    {/* actions sur le message: marquer lu, répondre, archiver, supprimer */}
                     <div className="flex items-center gap-1 pt-1 border-t border-gray-800">
                       <button onClick={() => toggleRead(msg)}
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs text-gray-400 hover:text-white hover:bg-gray-800 transition-colors">
@@ -396,17 +430,19 @@ export default function Admin() {
           </>
         )}
 
-        {/* ── CHAT TAB ─────────────────────────────────────── */}
+        {/* onglet chat en direct: WhatsApp-style avec messages persistants */}
         {activeTab === 'chat' && (
           <div className="flex flex-col bg-gray-900 rounded-xl overflow-hidden" style={{ height: '600px' }}>
 
-            {/* Chat header: stats + search + clear */}
+            {/* en-tête avec stats, recherche et bouton vider */}
             <div className="px-4 py-3 border-b border-gray-800 flex flex-col gap-2 shrink-0">
               <div className="flex items-center justify-between">
+                {/* stats du chat */}
                 <div className="flex gap-4 text-xs text-gray-400">
                   <span><span className="text-white font-medium">{allMessages.length}</span> messages</span>
                   <span><span className="text-violet-400 font-medium">{uniqueChatUsers}</span> utilisateurs</span>
                 </div>
+                {/* bouton pour vider tout l'historique */}
                 {allMessages.length > 0 && (
                   <button onClick={handleClearChat}
                     className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs text-gray-500 hover:text-red-400 hover:bg-gray-800 border border-gray-700 hover:border-red-900 transition-colors">
@@ -414,7 +450,7 @@ export default function Admin() {
                   </button>
                 )}
               </div>
-              {/* Search */}
+              {/* barre de recherche par utilisateur */}
               <div className="relative">
                 <FiSearch size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
                 <input value={chatSearch} onChange={e => setChatSearch(e.target.value)}
@@ -428,7 +464,7 @@ export default function Admin() {
               </div>
             </div>
 
-            {/* Messages area */}
+            {/* zone des messages avec scroll automatique */}
             <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-3">
               {filteredChat.length === 0 ? (
                 <div className="flex-1 flex flex-col items-center justify-center text-gray-600 py-16">
@@ -437,10 +473,11 @@ export default function Admin() {
                 </div>
               ) : (
                 filteredChat.map((msg) => {
+                  // différencie les messages de l'admin (à droite, violet) des autres (à gauche, gris)
                   const isAdmin = msg.username === 'Admin'
                   return (
                     <div key={msg.id} className={`flex items-end gap-2 group ${isAdmin ? 'flex-row-reverse' : 'flex-row'}`}>
-                      {/* Avatar (only for others) */}
+                      {/* avatar (seulement pour les autres utilisateurs) */}
                       {!isAdmin && (
                         <div className={`w-7 h-7 rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0 ${getColor(msg.username)}`}>
                           {getInitial(msg.username)}
@@ -448,11 +485,11 @@ export default function Admin() {
                       )}
 
                       <div className={`flex flex-col gap-0.5 max-w-[70%] ${isAdmin ? 'items-end' : 'items-start'}`}>
-                        {/* Username label */}
+                        {/* nom de l'utilisateur */}
                         <span className="text-xs text-gray-500 px-1">{msg.username}</span>
 
                         <div className="flex items-end gap-2">
-                          {/* Delete button on hover */}
+                          {/* bouton supprimer (visible au survol pour l'admin) */}
                           {isAdmin && (
                             <button onClick={() => handleDeleteChatMsg(msg)}
                               className="opacity-0 group-hover:opacity-100 p-1 text-gray-600 hover:text-red-400 transition-all shrink-0">
@@ -460,7 +497,7 @@ export default function Admin() {
                             </button>
                           )}
 
-                          {/* Bubble */}
+                          {/* bulle de message */}
                           <div className={`px-3 py-2 rounded-2xl text-sm leading-relaxed ${
                             isAdmin
                               ? 'bg-violet-600 text-white rounded-br-sm'
@@ -469,6 +506,7 @@ export default function Admin() {
                             {msg.text}
                           </div>
 
+                          {/* bouton supprimer (visible au survol pour les autres) */}
                           {!isAdmin && (
                             <button onClick={() => handleDeleteChatMsg(msg)}
                               className="opacity-0 group-hover:opacity-100 p-1 text-gray-600 hover:text-red-400 transition-all shrink-0">
@@ -477,7 +515,7 @@ export default function Admin() {
                           )}
                         </div>
 
-                        {/* Timestamp */}
+                        {/* horodatage du message */}
                         <span className="text-xs text-gray-600 px-1">
                           {formatTime(msg.timestamp || msg.created_at)}
                         </span>
@@ -489,7 +527,7 @@ export default function Admin() {
               <div ref={chatBottomRef} />
             </div>
 
-            {/* Input bar */}
+            {/* barre d'entrée pour envoyer des messages en tant qu'Admin */}
             <form onSubmit={sendChatMessage} className="flex items-center gap-2 px-4 py-3 border-t border-gray-800 shrink-0">
               <input
                 value={chatInput}
