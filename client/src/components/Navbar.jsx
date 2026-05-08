@@ -20,7 +20,7 @@ export default function Navbar() {
       scrolled ? 'bg-white/90 dark:bg-gray-950/90 backdrop-blur shadow-sm' : 'bg-transparent'
     }`}>
       <nav className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-        <a href="#hero" className="text-xl font-bold text-violet-600 dark:text-violet-400">
+        <a href="/#hero" className="text-xl font-bold text-violet-600 dark:text-violet-400">
           Pierre
         </a>
 

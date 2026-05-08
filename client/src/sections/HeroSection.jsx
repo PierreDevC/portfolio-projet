@@ -19,7 +19,7 @@ export default function HeroSection() {
             Pierre
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-400">
-            Développeur Full Stack — React · Node.js · MongoDB
+            Développeur Full Stack
           </p>
           <p className="text-gray-500 dark:text-gray-400 max-w-md">
             Je transforme des idées en applications web modernes, performantes et accessibles.

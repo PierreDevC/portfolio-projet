@@ -7,6 +7,7 @@ import projectsRoutes from './routes/projects.routes.js'
 import skillsRoutes from './routes/skills.routes.js'
 import experiencesRoutes from './routes/experiences.routes.js'
 import contactRoutes from './routes/contact.routes.js'
+import chatRoutes from './routes/chat.routes.js'
 import { errorMiddleware } from './middleware/error.middleware.js'
 
 const app = express()
@@ -26,6 +27,7 @@ app.use('/api/projects', projectsRoutes)
 app.use('/api/skills', skillsRoutes)
 app.use('/api/experiences', experiencesRoutes)
 app.use('/api/contact', contactRoutes)
+app.use('/api/chat', chatRoutes)
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }))
 

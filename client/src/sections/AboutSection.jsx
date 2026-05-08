@@ -25,19 +25,21 @@ export default function AboutSection() {
               <span className="text-violet-600 dark:text-violet-400">obsédé par les détails.</span>
             </h2>
             <p className="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
-              Je suis un étudiant en techniques de l'informatique au Collège LaSalle, passionné
-              par le développement web full-stack. J'aime construire des interfaces intuitives
-              et des APIs robustes.
+              Étudiant en techniques de l'informatique au Collège LaSalle, je me spécialise
+              en développement web et mobile full-stack. J'ai conçu et déployé des applications
+              prêtes pour la production supportant plusieurs utilisateurs, avec des pipelines
+              CI/CD et Docker.
             </p>
             <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-              En dehors du code, je m'intéresse à [vos intérêts]. Je cherche constamment à
-              apprendre de nouvelles technologies et à améliorer mes compétences.
+              Ma formation en design graphique nourrit mon attention portée à l'expérience
+              utilisateur et à l'interface. Bilingue (FR/EN), je m'intéresse particulièrement
+              au développement mobile et à l'intégration de l'IA dans les applications modernes.
             </p>
             <div className="grid grid-cols-3 gap-6 mt-8">
               {[
-                { value: '3+', label: "Années d'études" },
-                { value: '10+', label: 'Projets réalisés' },
-                { value: '5+', label: 'Technologies' },
+                { value: '5+', label: 'Projets déployés' },
+                { value: '15+', label: 'Technologies' },
+                { value: '2', label: 'Expériences pro' },
               ].map(stat => (
                 <div key={stat.label} className="text-center">
                   <p className="text-3xl font-bold text-violet-600 dark:text-violet-400">{stat.value}</p>

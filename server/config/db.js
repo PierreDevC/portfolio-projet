@@ -49,6 +49,13 @@ db.exec(`
     message    TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
+
+  CREATE TABLE IF NOT EXISTS chat_logs (
+    id        INTEGER PRIMARY KEY AUTOINCREMENT,
+    username  TEXT NOT NULL,
+    text      TEXT NOT NULL,
+    timestamp DATETIME NOT NULL
+  );
 `)
 
 // Idempotent column migrations (safe to run on existing DBs)

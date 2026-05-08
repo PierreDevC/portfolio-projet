@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { FiSend, FiMail, FiMapPin } from 'react-icons/fi'
+import { FiSend, FiMail, FiMapPin, FiLoader, FiCheckCircle } from 'react-icons/fi'
 import API from '../hooks/useApi'
 
 export default function ContactSection() {
@@ -49,12 +49,13 @@ export default function ContactSection() {
               className="px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500" />
             <textarea name="message" rows={5} placeholder="Votre message" required
               className="px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none" />
-            <button type="submit" disabled={status === 'sending'}
+            <button type="submit" disabled={status === 'sending' || status === 'success'}
               className="flex items-center justify-center gap-2 px-6 py-3 bg-violet-600 hover:bg-violet-700 disabled:opacity-60 text-white rounded-lg font-medium transition-colors">
-              <FiSend size={16} />
-              {status === 'sending' ? 'Envoi...' : 'Envoyer le message'}
+              {status === 'sending' && <FiLoader size={16} className="animate-spin" />}
+              {status === 'success' && <FiCheckCircle size={16} />}
+              {status !== 'sending' && status !== 'success' && <FiSend size={16} />}
+              {status === 'sending' ? 'Envoi en cours...' : status === 'success' ? 'Message envoyé !' : 'Envoyer le message'}
             </button>
-            {status === 'success' && <p className="text-green-600 dark:text-green-400 text-sm text-center">Message envoyé avec succès !</p>}
             {status === 'error' && <p className="text-red-600 dark:text-red-400 text-sm text-center">Erreur lors de l'envoi. Réessayez.</p>}
           </form>
         </div>

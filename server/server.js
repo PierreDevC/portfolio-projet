@@ -3,6 +3,7 @@ import { Server } from 'socket.io'
 import 'dotenv/config'
 import app from './app.js'
 import { autoSeed } from './seed/seed.js'
+import db from './config/db.js'
 
 
 await autoSeed()
@@ -32,9 +33,9 @@ io.on('connection', (socket) => {
 
   // envoi de message
   socket.on('message:send', (text) => {
-    io.emit('message:receive', {
-      id: Date.now(), username, text, timestamp: new Date().toISOString()
-    })
+    const timestamp = new Date().toISOString()
+    io.emit('message:receive', { id: Date.now(), username, text, timestamp })
+    db.prepare('INSERT INTO chat_logs (username, text, timestamp) VALUES (?,?,?)').run(username, text, timestamp)
   })
 
   // mettre à jour quand le user est en trai d'écrire
