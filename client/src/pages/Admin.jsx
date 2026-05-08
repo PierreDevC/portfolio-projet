@@ -448,10 +448,8 @@ export default function Admin() {
                       )}
 
                       <div className={`flex flex-col gap-0.5 max-w-[70%] ${isAdmin ? 'items-end' : 'items-start'}`}>
-                        {/* Username label (only for others) */}
-                        {!isAdmin && (
-                          <span className="text-xs text-gray-500 px-1">{msg.username}</span>
-                        )}
+                        {/* Username label */}
+                        <span className="text-xs text-gray-500 px-1">{msg.username}</span>
 
                         <div className="flex items-end gap-2">
                           {/* Delete button on hover */}
